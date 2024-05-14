@@ -10,7 +10,7 @@ const colors = {
     controls: {
         button: {
             border: 1,
-            background: { color: 0x646464, alpha: 1 },
+            background: { color: 0x303030, alpha: 1 },
             hover: { color: 0xb16925, alpha: 0.5 },
             active: { color: 0xb16925, alpha: 1 },
         },
@@ -25,8 +25,11 @@ const colors = {
             hover: { color: 0xffba7a },
             active: { color: 0xff9e44 },
         },
+        itemGrid: {
+            background: { color: 0x242424, alpha: 1 },
+        },
         panel: {
-            background: { color: 0x303030, alpha: 1, border: 2 },
+            background: { color: 0x403f40, alpha: 1, border: 2 },
         },
         slider: {
             slidebar: { color: 0xe2e2e2, p0: -95, p1: -80, p2: -10, p3: 0 },
@@ -42,6 +45,12 @@ const colors = {
             hover: { color: 0xb16925, p0: 15, p1: 5, p2: -10, p3: -50 },
             line: { color: 0x646464, p0: -25, p1: -50, p2: 25, p3: 0 },
         },
+        tab: {
+            border: 1,
+            background: { color: 0x8e8e8e, alpha: 1 },
+            hover: { color: 0xb16925, alpha: 0.5 },
+            active: { color: 0x403f40, alpha: 1 },
+        },
         textbox: {
             foreground: { color: 0x000000 },
             background: { color: 0xe2e2e2, alpha: 1 },
@@ -49,7 +58,8 @@ const colors = {
         },
     },
     dialog: {
-        background: { color: 0x303030, alpha: 1, border: 2 },
+        trim: { color: 0x303030, alpha: 1, border: 1 },
+        background: { color: 0x403f40, alpha: 1, border: 2 },
         line: { background: { color: 0x646464, alpha: 0.7, border: 1 } },
     },
     editor: {
@@ -63,6 +73,15 @@ const colors = {
 const fontFamily = "'Roboto', sans-serif"
 
 const styles = {
+    button: {
+        text: new TextStyle({
+            fill: colors.controls.panel.background.color,
+            fontFamily,
+            fontWeight: '300',
+            fontSize: 16,
+            strokeThickness: 1,
+        }),
+    },
     controls: {
         checkbox: new TextStyle({
             fill: colors.controls.checkbox.foreground.color,

@@ -4,7 +4,9 @@ import G from '../common/globals'
 import { Panel } from './controls/Panel'
 import { Slot } from './controls/Slot'
 import F from './controls/functions'
-import { colors } from './style'
+import { colors, styles } from './style'
+import { ItemGrid } from './controls/ItemGrid'
+import { Button } from './controls/Button'
 
 class QuickbarSlot extends Slot {
     public get itemName(): string {
@@ -27,63 +29,49 @@ export class QuickbarPanel extends Panel {
     private iWidth = 442
     private iHeight: number
     private rows: number
+    private visibleRows: number
 
     private slots: QuickbarSlot[]
-    private slotsContainer: PIXI.Container
+    private quickbarSelectorSlots: ItemGrid
+    private slotsContainer: ItemGrid
 
     public constructor(rows = 1, itemNames?: string[]) {
         super(
-            442,
-            24 + rows * 38,
+            458,
+            12 + 2 * 40,
             colors.quickbar.background.color,
             colors.quickbar.background.alpha,
             colors.quickbar.background.border
         )
 
         this.rows = rows
-        this.iHeight = 24 + rows * 38
+        this.visibleRows = 2
+        this.iHeight = this.visibleRows * 40
         this.slots = new Array<QuickbarSlot>(rows * 10)
 
-        this.slotsContainer = new PIXI.Container()
-        this.slotsContainer.position.set(12, 12)
-        this.addChild(this.slotsContainer)
-
         this.generateSlots(itemNames)
-
-        const t = QuickbarPanel.createTriangleButton(15, 14)
-        t.position.set((this.iWidth - t.width) / 2, (this.iHeight - t.height) / 2)
-        t.on('pointerdown', this.changeActiveQuickbar, this)
-        this.addChild(t)
-    }
-
-    private static createTriangleButton(width: number, height: number): PIXI.Graphics {
-        const button = new PIXI.Graphics()
-
-        button
-            .beginFill(colors.controls.button.background.color)
-            .moveTo(0, height)
-            .lineTo(width / 2, 0)
-            .lineTo(width, height)
-            .lineTo(0, height)
-            .endFill()
-
-        button.interactive = true
-
-        button.on('pointerover', () => {
-            button.alpha = 0.8
-        })
-        button.on('pointerout', () => {
-            button.alpha = 1
-        })
-
-        return button
     }
 
     public generateSlots(itemNames?: string[]): void {
+        this.quickbarSelectorSlots = new ItemGrid(1, 2)
+        this.quickbarSelectorSlots.position.set(6, 6)
+        this.addChild(this.quickbarSelectorSlots)
+
+        this.slotsContainer = new ItemGrid(10, 2)
+        this.slotsContainer.position.set(50, 6)
+        this.addChild(this.slotsContainer)
+
         for (let r = 0; r < this.rows; r++) {
+            if (r < this.visibleRows) {
+                const quickbarSelector = new Button(34, 34, colors.controls.tab.background.color, 1)
+                quickbarSelector.position.set(0, r * 40)
+                quickbarSelector.content = new PIXI.Text(r.toString(), styles.button.text)
+                this.quickbarSelectorSlots.addChild(quickbarSelector)
+            }
+
             for (let i = 0; i < 10; i++) {
                 const quickbarSlot = new QuickbarSlot()
-                quickbarSlot.position.set((36 + 2) * i + (i > 4 ? 38 : 0), 38 * r)
+                quickbarSlot.position.set((38 + 2) * i, 40 * r)
 
                 if (itemNames && itemNames[r * 10 + i]) {
                     quickbarSlot.assignItem(itemNames[r * 10 + i])
@@ -127,7 +115,9 @@ export class QuickbarPanel extends Panel {
                 })
 
                 this.slots[r * 10 + i] = quickbarSlot
-                this.slotsContainer.addChild(quickbarSlot)
+                if (r < this.visibleRows) {
+                    this.slotsContainer.addChild(quickbarSlot)
+                }
             }
         }
     }

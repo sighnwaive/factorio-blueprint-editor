@@ -22,6 +22,17 @@ function ShadeColor(color: number, percent: number): number {
     )
 }
 
+function DrawBorderLine(rectangle: PIXI.Graphics, color: number, x = 0, y = 0): PIXI.Graphics {
+    rectangle
+        .lineStyle({
+            width: 1.5,
+            color,
+            alignment: 0,
+        })
+        .lineTo(x, y)
+    return rectangle
+}
+
 /**
  * Draw Rectangle with Border
  *
@@ -29,7 +40,7 @@ function ShadeColor(color: number, percent: number): number {
  * @param height - Height of the Rectangle
  * @param background - Background Color of the Rectangle
  * @param alpha - Background Alpha of the Rectangle (1...no transparency)
- * @param border - Border Width of the Rectangle (0...no border)
+ * @param border - Border Width of the Rectangle
  * @param pressed - True if the Rectangle Border shall apear as the Rectangle is pressed rather than raised
  */
 function DrawRectangle(
@@ -40,66 +51,41 @@ function DrawRectangle(
     border = 0,
     pressed = false
 ): PIXI.Graphics {
+    // Draw Rectangle
+    // Draw Border if requested
+    // as inset if requested.
+
     const rectangle = new PIXI.Graphics()
     rectangle.alpha = alpha
     rectangle.beginFill(background)
-    if (border === 0) {
-        rectangle.drawRect(0, 0, width, height)
-    } else {
-        if (border > 0) {
-            rectangle
-                .lineStyle({
-                    width: 1,
-                    color: ShadeColor(background, pressed ? -12.5 : 22.5),
-                    alignment: 0,
-                })
-                .moveTo(0, height)
-                .lineTo(0, 0)
-                .lineTo(width, 0)
-                .lineStyle({
-                    width: 1,
-                    color: ShadeColor(background, pressed ? 10 : -7.5),
-                    alignment: 0,
-                })
-                .lineTo(width, height)
-                .lineTo(0, height)
-        }
-        if (border > 1) {
-            rectangle
-                .lineStyle({
-                    width: 1,
-                    color: ShadeColor(background, pressed ? -10 : 20),
-                    alignment: 0,
-                })
-                .moveTo(1, height - 1)
-                .lineTo(1, 1)
-                .lineTo(width - 1, 1)
-                .lineStyle({
-                    width: 1,
-                    color: ShadeColor(background, pressed ? 7.5 : -5),
-                    alignment: 0,
-                })
-                .lineTo(width - 1, height - 1)
-                .lineTo(1, height - 1)
-        }
-        if (border > 2) {
-            rectangle
-                .lineStyle({
-                    width: 1,
-                    color: ShadeColor(background, pressed ? -7.5 : 17.5),
-                    alignment: 0,
-                })
-                .moveTo(2, height - 2)
-                .lineTo(2, 2)
-                .lineTo(width - 2, 2)
-                .lineStyle({
-                    width: 1,
-                    color: ShadeColor(background, pressed ? 5 : -2.5),
-                    alignment: 0,
-                })
-                .lineTo(width - 2, height - 2)
-                .lineTo(2, height - 2)
-        }
+    rectangle.drawRect(0, 0, width, height)
+    if (border > 0) {
+        rectangle.moveTo(0, height)
+        DrawBorderLine(rectangle, ShadeColor(background, pressed ? 10 : -7.5), width, height)
+        DrawBorderLine(rectangle, ShadeColor(background, pressed ? 5 : -2.5), width, 0)
+        DrawBorderLine(rectangle, ShadeColor(background, pressed ? -7.5 : 17.5), 0, 0)
+        DrawBorderLine(rectangle, ShadeColor(background, pressed ? 5 : -2.5), 0, height)
+    }
+    if (border > 1) {
+        rectangle.moveTo(0, height)
+        DrawBorderLine(rectangle, ShadeColor(background, pressed ? 10 : -7.5), width, height)
+        DrawBorderLine(rectangle, ShadeColor(background, pressed ? 7.5 : -5), width, 0)
+        DrawBorderLine(rectangle, ShadeColor(background, pressed ? -12.5 : 22.5), 0, 0)
+        DrawBorderLine(rectangle, ShadeColor(background, pressed ? 7.5 : -5), 0, height)
+    }
+    if (border > 2) {
+        rectangle.moveTo(0, height)
+        DrawBorderLine(rectangle, ShadeColor(background, pressed ? 7.5 : -5), width - 1, height - 1)
+        DrawBorderLine(rectangle, ShadeColor(background, pressed ? 5 : -2.5), width - 1, 1)
+        DrawBorderLine(rectangle, ShadeColor(background, pressed ? -10 : 20), 1, 1)
+        DrawBorderLine(rectangle, ShadeColor(background, pressed ? 5 : -2.5), 1, height - 1)
+    }
+    if (border > 3) {
+        rectangle.moveTo(0, height)
+        DrawBorderLine(rectangle, ShadeColor(background, pressed ? 5 : -2.5), width - 2, height - 2)
+        DrawBorderLine(rectangle, ShadeColor(background, pressed ? 2.5 : 0), width - 2, 2)
+        DrawBorderLine(rectangle, ShadeColor(background, pressed ? -7.5 : 17.5), 2, 2)
+        DrawBorderLine(rectangle, ShadeColor(background, pressed ? 2.5 : 0), 2, height - 2)
     }
     rectangle.endFill()
     return rectangle
@@ -286,11 +272,11 @@ function applyTint(s: PIXI.Sprite, tint: ColorWithAlpha): void {
 }
 
 export default {
-    ShadeColor,
-    DrawRectangle,
-    DrawControlFace,
+    applyTint,
     CreateIcon,
     CreateIconWithAmount,
     CreateRecipe,
-    applyTint,
+    DrawControlFace,
+    DrawRectangle,
+    ShadeColor,
 }

@@ -12,10 +12,10 @@ export class Slot extends Button {
 
     // Override Pressed appearance of Button
     public get pressed(): boolean {
-        return true
+        return false
     }
 
-    public constructor(width = 36, height = 36, border = 1) {
-        super(width, height, border)
+    public constructor(width = 34, height = 34, border = 1) {
+        super(width, height, undefined, border)
     }
 }

@@ -17,7 +17,7 @@ export class UIContainer extends PIXI.Container {
         super()
 
         this.debugContainer = new DebugContainer()
-        this.quickbarPanel = new QuickbarPanel(2)
+        this.quickbarPanel = new QuickbarPanel(10)
         this.entityInfoPanel = new EntityInfoPanel()
         this.dialogsContainer = new PIXI.Container()
         this.paintIconContainer = new PIXI.Container()

@@ -3,6 +3,7 @@ import G from '../../common/globals'
 import { colors, styles } from '../style'
 import F from './functions'
 import { Panel } from './Panel'
+import { Button } from './Button'
 
 /**
  * Base Dialog for usage whenever a dialog shall be shown to the user
@@ -17,13 +18,15 @@ export abstract class Dialog extends Panel {
     /** Stores all open dialogs */
     protected static s_openDialogs: Dialog[] = []
 
-    public constructor(width: number, height: number, title?: string) {
+    private m_panel: PIXI.Graphics
+
+    public constructor(width: number, height: number, title?: string, search?: boolean) {
         super(
             width,
             height,
-            colors.dialog.background.color,
-            colors.dialog.background.alpha,
-            colors.dialog.background.border
+            colors.dialog.trim.color,
+            colors.dialog.trim.alpha,
+            colors.dialog.trim.border
         )
 
         this.visible = true
@@ -32,6 +35,24 @@ export abstract class Dialog extends Panel {
 
         if (title !== undefined) {
             this.addLabel(12, 10, title, styles.dialog.title)
+        }
+
+        this.addDialogControls(search)
+
+        this.m_panel = F.DrawRectangle(
+            width - 20,
+            height - 62,
+            colors.dialog.background.color,
+            colors.dialog.background.alpha,
+            colors.dialog.background.border,
+            true
+        )
+        this.m_panel.position.set(10, 44)
+        this.addChild(this.m_panel)
+        // this.addChild = this.m_panel.addChild
+        this.addChild = (...children) => {
+            console.log('test')
+            return this.m_panel.addChild(...children)
         }
 
         Dialog.s_openDialogs.push(this)
@@ -82,6 +103,32 @@ export abstract class Dialog extends Panel {
 
         this.emit('close')
         this.destroy()
+    }
+
+    /**
+     * Add Controls to Dialog - This is the close button in the top right.
+     */
+    protected addDialogControls(search: boolean) {
+        const x = this.width - 28
+        const y = 8
+        const closeControl: Button = new Button(20, 20, undefined, 1)
+        closeControl.position.set(x, y)
+        closeControl.on('pointerdown', (e: PIXI.InteractionEvent) => {
+            if (e.data.button === 0) {
+                this.close()
+            }
+        })
+        this.addChild(closeControl)
+        if (search) {
+            const searchControl: Button = new Button(20, 20, undefined, 1)
+            searchControl.position.set(x - 28, y)
+            searchControl.on('pointerdown', (e: PIXI.InteractionEvent) => {
+                if (e.data.button === 0) {
+                }
+            })
+
+            this.addChild(searchControl)
+        }
     }
 
     /**

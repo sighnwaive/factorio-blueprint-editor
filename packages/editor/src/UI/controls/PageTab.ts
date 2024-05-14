@@ -5,7 +5,7 @@ import F from './functions'
 /**
  * Base Button
  */
-export class Button extends PIXI.Container {
+export class PageTab extends PIXI.Container {
     /** Background Graphic */
     private readonly m_Background: PIXI.Graphics
 
@@ -21,12 +21,7 @@ export class Button extends PIXI.Container {
     /** Data of Control */
     private m_Data: unknown
 
-    public constructor(
-        width = 36,
-        height = 36,
-        background = colors.controls.button.background.color,
-        border = colors.controls.button.border
-    ) {
+    public constructor(width = 36, height = 36, border = colors.controls.tab.border) {
         super()
 
         this.interactive = true
@@ -35,30 +30,30 @@ export class Button extends PIXI.Container {
         this.m_Background = F.DrawRectangle(
             width,
             height,
-            background,
-            colors.controls.button.background.alpha,
+            this.background,
+            colors.controls.tab.background.alpha,
             border,
             this.pressed
         )
         this.m_Background.position.set(0, 0)
 
         this.m_Active = F.DrawRectangle(
-            width,
-            height,
-            colors.controls.button.active.color,
-            colors.controls.button.active.alpha,
-            border,
-            !this.pressed
+            width + 4,
+            height + 4,
+            colors.controls.tab.active.color,
+            colors.controls.tab.active.alpha,
+            false,
+            false
         )
-        this.m_Active.position.set(0, 0)
+        this.m_Active.position.set(-2, -2)
         this.m_Active.visible = false
 
         this.m_Hover = F.DrawRectangle(
             width,
             height,
-            colors.controls.button.hover.color,
-            colors.controls.button.hover.alpha,
-            0
+            colors.controls.tab.hover.color,
+            colors.controls.tab.hover.alpha,
+            false
         )
         this.m_Hover.position.set(0, 1)
         this.m_Hover.visible = false
@@ -102,7 +97,7 @@ export class Button extends PIXI.Container {
         if (content !== undefined) {
             // Set content for button
             this.m_Content = content
-            this.m_Content.position.set(this.width / 2 - 1, this.height / 2 - 1)
+            this.m_Content.position.set(this.width / 2, this.height / 2)
 
             // Add content to button
             this.addChild(this.m_Content)
@@ -120,12 +115,12 @@ export class Button extends PIXI.Container {
 
     /** Background color of the button (can be overriden) */
     protected get background(): number {
-        return colors.controls.button.background.color
+        return colors.controls.tab.background.color
     }
 
     /** Rollover color of the button (can be overriden) */
     protected get hover(): number {
-        return colors.controls.button.hover.color
+        return colors.controls.tab.hover.color
     }
 
     /** Shall button be raised or pressed (can be overridden) */

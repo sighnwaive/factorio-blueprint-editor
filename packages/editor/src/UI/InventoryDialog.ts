@@ -5,6 +5,8 @@ import F from './controls/functions'
 import { Dialog } from './controls/Dialog'
 import { Button } from './controls/Button'
 import { colors, styles } from './style'
+import { ItemGrid } from './controls/ItemGrid'
+import { PageTab } from './controls/PageTab'
 
 /*
     Cols
@@ -33,6 +35,8 @@ import { colors, styles } from './style'
 
 /** Inventory Dialog - Displayed to the user if there is a need to select an item */
 export class InventoryDialog extends Dialog {
+    private readonly m_ItemGrid: ItemGrid
+
     /** Container for Inventory Group Buttons */
     private readonly m_InventoryGroups: PIXI.Container
 
@@ -53,14 +57,18 @@ export class InventoryDialog extends Dialog {
         itemsFilter?: string[],
         selectedCallBack?: (selectedItem: string) => void
     ) {
-        super(404, 442, title)
+        super(438, 514, title, true)
+
+        this.m_ItemGrid = new ItemGrid(10, 9)
+        this.m_ItemGrid.position.set(10, 84)
+        this.addChild(this.m_ItemGrid)
 
         this.m_InventoryGroups = new PIXI.Container()
-        this.m_InventoryGroups.position.set(12, 46)
+        this.m_InventoryGroups.position.set(0, 2)
         this.addChild(this.m_InventoryGroups)
 
         this.m_InventoryItems = new PIXI.Container()
-        this.m_InventoryItems.position.set(12, 126)
+        this.m_InventoryItems.position.set(12, 86)
         this.addChild(this.m_InventoryItems)
 
         let groupIndex = 0
@@ -81,7 +89,12 @@ export class InventoryDialog extends Dialog {
                     if (itemsFilter === undefined) {
                         const itemData = FD.items[item.name]
                         if (!itemData) continue
-                        if (!itemData.place_result && !itemData.place_as_tile && !itemData.wire_count) continue
+                        if (
+                            !itemData.place_result &&
+                            !itemData.place_as_tile &&
+                            !itemData.wire_count
+                        )
+                            continue
                         // needed for robots/trains/cars
                         if (itemData.place_result && !FD.entities[itemData.place_result]) continue
                     } else {
@@ -94,7 +107,7 @@ export class InventoryDialog extends Dialog {
                     }
 
                     const button: Button = new Button(36, 36)
-                    button.position.set(itemColIndex * 38, itemRowIndex * 38)
+                    button.position.set(itemColIndex * 40, itemRowIndex * 40)
                     button.content = F.CreateIcon(item.name)
                     button.on('pointerdown', (e: PIXI.InteractionEvent) => {
                         e.stopPropagation()
@@ -119,7 +132,6 @@ export class InventoryDialog extends Dialog {
 
                     itemColIndex += 1
                     subgroupHasItems = true
-                    // }
                 }
 
                 if (subgroupHasItems) {
@@ -132,20 +144,20 @@ export class InventoryDialog extends Dialog {
                 inventoryGroupItems.visible = groupIndex === 0
                 this.m_InventoryItems.addChild(inventoryGroupItems)
 
-                const button = new Button(68, 68, 3)
-                button.active = groupIndex === 0
-                button.position.set(groupIndex * 70, 0)
-                button.content = F.CreateIcon(group.name, group.name === 'creative' ? 32 : 64)
-                button.data = inventoryGroupItems
-                button.on('pointerdown', (e: PIXI.InteractionEvent) => {
+                const page = new PageTab(82, 68, 2)
+                page.active = groupIndex === 0
+                page.position.set(groupIndex * 84, 0)
+                page.content = F.CreateIcon(group.name, group.name === 'creative' ? 32 : 64)
+                page.data = inventoryGroupItems
+                page.on('pointerdown', (e: PIXI.InteractionEvent) => {
                     if (e.data.button === 0) {
-                        if (!button.active) {
+                        if (!page.active) {
                             for (const inventoryGroup of this.m_InventoryGroups
-                                .children as Button[]) {
-                                inventoryGroup.active = inventoryGroup === button
+                                .children as PageTab[]) {
+                                inventoryGroup.active = inventoryGroup === page
                             }
                         }
-                        const buttonData: PIXI.Container = button.data as PIXI.Container
+                        const buttonData: PIXI.Container = page.data as PIXI.Container
                         if (!buttonData.visible) {
                             for (const inventoryGroupItems of this.m_InventoryItems
                                 .children as PIXI.Container[]) {
@@ -157,33 +169,11 @@ export class InventoryDialog extends Dialog {
                     }
                 })
 
-                this.m_InventoryGroups.addChild(button)
+                this.m_InventoryGroups.addChild(page)
 
                 groupIndex += 1
             }
         }
-
-        const recipePanel: PIXI.Container = new PIXI.Container()
-        recipePanel.position.set(0, 442)
-        this.addChild(recipePanel)
-
-        const recipeBackground: PIXI.Graphics = F.DrawRectangle(
-            404,
-            78,
-            colors.dialog.background.color,
-            colors.dialog.background.alpha,
-            colors.dialog.background.border
-        )
-        recipeBackground.position.set(0, 0)
-        recipePanel.addChild(recipeBackground)
-
-        this.m_RecipeLabel = new PIXI.Text('', styles.dialog.label)
-        this.m_RecipeLabel.position.set(12, 10)
-        recipePanel.addChild(this.m_RecipeLabel)
-
-        this.m_RecipeContainer = new PIXI.Container()
-        this.m_RecipeContainer.position.set(12, 36)
-        recipePanel.addChild(this.m_RecipeContainer)
     }
 
     /** Override automatically set position of dialog due to additional area for recipe */
